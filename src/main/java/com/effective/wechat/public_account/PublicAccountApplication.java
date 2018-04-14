@@ -8,5 +8,6 @@ public class PublicAccountApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PublicAccountApplication.class, args);
+        System.out.println("====start weiChat public account server success====");
     }
 }
