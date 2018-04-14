@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.effective.wechat.public_account.model.AccessToken;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import java.util.concurrent.locks.Lock;
 
 /**
  * 微信基础json工具类
@@ -33,7 +34,16 @@ public class WxBaseJson {
 
         Integer expiresIn = (Integer) jsonObject.get("expires_in");
         AccessToken model = new AccessToken(accessToken,expiresIn);
-        model.updateAccessToken(accessToken,expiresIn);
+        Lock lock = model.getAccessTokenLock();
+        try {
+            lock.lock();
+            model.updateAccessToken(accessToken,expiresIn);
+
+        }catch (Exception e){
+            e.getCause();
+        }finally {
+            lock.unlock();
+        }
         return model;
     }
 

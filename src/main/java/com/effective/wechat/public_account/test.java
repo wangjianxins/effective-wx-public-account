@@ -1,14 +1,10 @@
 package com.effective.wechat.public_account;
-
+import com.effective.wechat.public_account.model.WxOAuth;
+import com.effective.wechat.public_account.model.WxUserInfo;
 import com.effective.wechat.public_account.service.WxBaseService;
-import me.chanjar.weixin.common.api.WxConsts;
-import me.chanjar.weixin.common.exception.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.api.impl.WxMpServiceHttpClientImpl;
-import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
-import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
+import com.effective.wechat.public_account.service.WxOAuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,51 +14,42 @@ import javax.servlet.http.HttpServlet;
 
 @RestController
 public class test extends HttpServlet {
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private WxBaseService wxBaseService;
+    @Autowired
+    private WxOAuthService wxOAuthService;
 
-    @RequestMapping("/wx")
+    /**
+     * 获得accessToken接口
+     * @return
+     */
+    @RequestMapping("/getAccessToken")
     @ResponseBody
     public String wx(){
         return wxBaseService.getAccessToken();
     }
 
-
-    @RequestMapping("/test")
-    public  void test(){
-        WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
-        config.setAppId("..."); // 设置微信公众号的appid
-        config.setSecret("..."); // 设置微信公众号的app corpSecret
-
-        WxMpService wxService = new WxMpServiceImpl();// 实际项目中请注意要保持单例，不要在每次请求时构造实例，具体可以参考demo项目
-        wxService.setWxMpConfigStorage(config);
-        WxMpService wxMpService = new WxMpServiceHttpClientImpl();
-        String url  = "jjjj";
-        wxMpService.oauth2buildAuthorizationUrl(url,WxConsts.OAuth2Scope.SNSAPI_USERINFO, null);
-
-        WxMpOAuth2AccessToken wxMpOAuth2AccessToken = null;
-        try {
-            wxMpOAuth2AccessToken = wxMpService.oauth2getAccessToken("code");
-        } catch (WxErrorException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            WxMpUser wxMpUser = wxMpService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
-        } catch (WxErrorException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            wxMpOAuth2AccessToken = wxMpService.oauth2refreshAccessToken(wxMpOAuth2AccessToken.getRefreshToken());
-        } catch (WxErrorException e) {
-            e.printStackTrace();
-        }
-
-        boolean valid = wxMpService.oauth2validateAccessToken(wxMpOAuth2AccessToken);
-
+    /**
+     * 获取网页授权登录的第一步地址
+     * @return
+     */
+    @RequestMapping("/getOAuth2FirstLoginUrl")
+    @ResponseBody
+    public String getOAuth2FirstLoginUrl(){
+        return wxOAuthService.oauth2LoginUrl();
     }
+
+    @RequestMapping("/redirect/url")
+    @ResponseBody
+    public String redirectUrl(String code){
+        logger.info("first code ={}",code);
+        WxOAuth wxOAuth = wxOAuthService.oauth2AccessToken(code);
+        WxUserInfo wxUserInfo = wxOAuthService.getUserInfo(wxOAuth);
+        return wxUserInfo.toString();
+    }
+
 
 
 }

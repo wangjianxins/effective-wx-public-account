@@ -35,8 +35,8 @@ public class WxBaseServiceImpl implements WxBaseService {
     private WxBaseJson wxBaseJson;
 
     private String paramAccesstokenUrl;
-    private static WxBase wxBase;
-    private static AccessToken accessToken;
+    public static WxBase wxBase;
+    private volatile static AccessToken accessToken;
 
 
     @Override
@@ -46,12 +46,15 @@ public class WxBaseServiceImpl implements WxBaseService {
                 return accessToken.getAccessToken();
             }
         }
-
         String url = this.getAccessTokenUrl();
         String result = HttpClientUtils.getToUrl(url);
         logger.info("获取accessToken结果={}",result);
 
-        accessToken = wxBaseJson.accessTokenJson(result);
+        try {
+            accessToken = wxBaseJson.accessTokenJson(result);
+        }catch (Exception e){
+            return e.getMessage();
+        }
 
         return  accessToken.getAccessToken();
     }
