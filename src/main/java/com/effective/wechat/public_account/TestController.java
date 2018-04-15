@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServlet;
 
 @RestController
-public class test extends HttpServlet {
+public class TestController extends HttpServlet {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -25,7 +25,7 @@ public class test extends HttpServlet {
      * 获得accessToken接口
      * @return
      */
-    @RequestMapping("/getAccessToken")
+    @RequestMapping("/base/getAccessToken")
     @ResponseBody
     public String wx(){
         return wxBaseService.getAccessToken();
@@ -35,7 +35,7 @@ public class test extends HttpServlet {
      * 获取网页授权登录的第一步地址
      * @return
      */
-    @RequestMapping("/getOAuth2FirstLoginUrl")
+    @RequestMapping("/oauth/getOAuth2FirstLoginUrl")
     @ResponseBody
     public String getOAuth2FirstLoginUrl(){
         return wxOAuthService.oauth2LoginUrl();
@@ -47,7 +47,7 @@ public class test extends HttpServlet {
      * @param code
      * @return
      */
-    @RequestMapping("/redirect/url")
+    @RequestMapping("/oauth/redirect/url")
     @ResponseBody
     public String redirectUrl(String code){
         logger.info("first code ={}",code);

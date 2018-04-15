@@ -1,6 +1,6 @@
 package com.effective.wechat.public_account.model;
 
-public class WxUserInfo {
+public class WxUserInfo{
     private String openid;
     private String nickname;
     private String sex;

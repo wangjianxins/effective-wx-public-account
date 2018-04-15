@@ -12,17 +12,19 @@ import org.springframework.stereotype.Component;
  * @author wangjianxin
  */
 @Component
-public class WxOAuthJson {
+public class WxOAuthJson extends BaseJson{
 
+    /**
+     * 解析
+     * @param result
+     * @return
+     */
     public WxOAuth oauthAccessTokn(String result){
 
         JSONObject jsonObject = JSONObject.parseObject(result);
         String oauthAccessToken = (String) jsonObject.get("access_token");
         if(StringUtils.isEmpty(oauthAccessToken)){
-            Integer errcode = (Integer) jsonObject.get("errcode");
-            String errmsg = (String) jsonObject.get("errmsg");
-            throw new RuntimeException("获取accessToken失败，错误码："+errcode+"，错误信息"+errmsg);
-
+            this.errorJson(jsonObject,"oauthAccessToken");
         }
         String openid = (String) jsonObject.get("openid");
         WxOAuth wxOAuth = new WxOAuth();
@@ -47,9 +49,7 @@ public class WxOAuthJson {
             wxUserInfo.setCountry((String) jsonObject.get("country"));
             wxUserInfo.setHeadImg((String) jsonObject.get("headimgurl"));
         }else{
-            String errmsg = (String) jsonObject.get("errmsg");
-            throw new RuntimeException("获取accessToken失败，错误码："+errcode+"，错误信息"+errmsg);
-
+            this.errorJson(jsonObject,"userInfo");
         }
 
         return wxUserInfo;
