@@ -41,6 +41,12 @@ public class test extends HttpServlet {
         return wxOAuthService.oauth2LoginUrl();
     }
 
+    /**
+     * 同意授权后，微信主动回掉的地址，在application中配置
+     * 接口返回微信用户用户详细信息
+     * @param code
+     * @return
+     */
     @RequestMapping("/redirect/url")
     @ResponseBody
     public String redirectUrl(String code){
